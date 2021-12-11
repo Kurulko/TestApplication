@@ -1,0 +1,10 @@
+﻿@{
+    ViewData["Title"] = "Tests";
+}
+@model List<TestApplication.Models.Test>
+
+@foreach(var item in Model)
+{
+    <div class="test">@item.Name <a asp-controller="Tests" asp-action="Test" asp-route-id=@item.Id>Start</a></div>
+    <br/>
+}

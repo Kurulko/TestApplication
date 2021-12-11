@@ -1,0 +1,43 @@
+﻿@{
+    ViewData["Title"] = "Task";
+}
+@model TestApplication.Controllers.TaskAndIdOfTest
+@using TestApplication.Controllers
+
+
+@Model.Task.Question
+<br />
+<form name="myForm">
+    <input type="radio" name="answers" value="rightValue" /><span>@Model.Task.Answer</span>
+    <input type="radio" name="answers" value="randomValue1" /><span>@RandomFigures.RandomNumber(0, 50)</span>
+    <input type="radio" name="answers" value="randomValue2" /><span>@RandomFigures.RandomNumber(0, 50)</span>
+</form>
+<div id="printBlockChose"></div>
+<script>
+    function onclick(e) {
+        var printBlockChose = document.getElementById("printBlockChose");
+
+        var answer = e.target.value;
+
+        printBlockChose.textContent = "You choosed: " + answer;
+
+        if (answer == "rightValue") {
+            @CsInHtml.IncrementByCountRightTask();
+            return;
+        }
+        @*else {
+            @CsInHtml.DecrementByCountRightTask();
+        }*@
+    }
+    for (var i = 0; i < myForm.answers.length; i++) {
+        myForm.answers[i].addEventListener("click", onclick);
+    }
+</script>
+@if (CsInHtml.Increment(Model.Task.Id) < TestsController.CountOfTask)
+{
+    <a asp-controller="Tests" asp-action="Task" asp-route-id=@Model.IdOfTest asp-route-number=@CsInHtml.Increment(Model.Task.Id)>Next</a>
+}
+else
+{
+    <a asp-controller="Tests" asp-action="Result">Result</a>
+}

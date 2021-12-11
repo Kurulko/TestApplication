@@ -1,0 +1,20 @@
+﻿@{
+    ViewData["Title"] = "Test";
+}
+@model TestApplication.Models.Test
+@Model.Description
+<form name="myForm">
+    <input type="checkbox" name="enabled"><span>I agree to start</span>
+</form>
+<br/>
+<a id="printBlock" asp-controller="Tests" asp-action="Task" asp-route-id=@Model.Id asp-route-number=@Model.Tasks[0].Id></a>
+<script>
+    var enabledBox = document.myForm.enabled;
+    function onclick(e) {
+        var printBlock = document.getElementById("printBlock");
+        var enabled = e.target.checked;
+        if (enabled)
+            printBlock.textContent = "Proceed";
+    }
+    enabledBox.addEventListener("click", onclick);
+</script>

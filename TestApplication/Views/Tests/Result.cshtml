@@ -1,0 +1,8 @@
+﻿@{
+    ViewData["Title"] = "Result";
+}
+
+@model int
+The result of the test: @Model / @TestApplication.Controllers.TestsController.CountOfTask
+<br />
+<a asp-controller="Tests" asp-action="Tests">Back</a>

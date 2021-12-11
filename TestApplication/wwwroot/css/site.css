@@ -1,0 +1,11 @@
+﻿.test {
+    background-color: lightblue;
+    height: 50px;
+    width: 300px;
+    border-radius: 10px;
+}
+* {
+    text-align: center;
+    color: black;
+}
+
