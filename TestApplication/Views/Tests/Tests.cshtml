@@ -1,10 +1,10 @@
 ﻿@{
     ViewData["Title"] = "Tests";
 }
-@model List<TestApplication.Models.Test>
 
-@foreach(var item in Model)
+@model List<Test>
+@foreach (var item in Model)
 {
-    <div class="test">@item.Name <a asp-controller="Tests" asp-action="Test" asp-route-id=@item.Id>Start</a></div>
-    <br/>
+    <a class="btn btn-primary" asp-controller="Tests" asp-action="Test" asp-route-id=@item.Id>@item.Name Start</a>
+    <br /><br />
 }

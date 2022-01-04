@@ -1,43 +1,23 @@
 ﻿@{
     ViewData["Title"] = "Task";
 }
-@model TestApplication.Controllers.TaskAndIdOfTest
-@using TestApplication.Controllers
 
+@model TaskAndResult
 
 @Model.Task.Question
 <br />
-<form name="myForm">
-    <input type="radio" name="answers" value="rightValue" /><span>@Model.Task.Answer</span>
-    <input type="radio" name="answers" value="randomValue1" /><span>@RandomFigures.RandomNumber(0, 50)</span>
-    <input type="radio" name="answers" value="randomValue2" /><span>@RandomFigures.RandomNumber(0, 50)</span>
+<form>
+    <p>
+        <label>@Model.Task.Answer</label>
+        <input type="radio" name="result" value="@(Model.Result+1)" />
+    </p>
+    <p>
+        <label>@Model.Task.FakeAnswer</label>
+        <input type="radio" name="result" value="@(Model.Result)" />
+    </p>
+    <input type="hidden" name="idTest" value="@Model.Task.Test.Id"/>
+    <input type="hidden" name="idTask" value="@(Model.IdTask+1)"/>
+    <p>
+        <input type="submit" value="Next" class="btn btn-outline-info" />
+    </p>
 </form>
-<div id="printBlockChose"></div>
-<script>
-    function onclick(e) {
-        var printBlockChose = document.getElementById("printBlockChose");
-
-        var answer = e.target.value;
-
-        printBlockChose.textContent = "You choosed: " + answer;
-
-        if (answer == "rightValue") {
-            @CsInHtml.IncrementByCountRightTask();
-            return;
-        }
-        @*else {
-            @CsInHtml.DecrementByCountRightTask();
-        }*@
-    }
-    for (var i = 0; i < myForm.answers.length; i++) {
-        myForm.answers[i].addEventListener("click", onclick);
-    }
-</script>
-@if (CsInHtml.Increment(Model.Task.Id) < TestsController.CountOfTask)
-{
-    <a asp-controller="Tests" asp-action="Task" asp-route-id=@Model.IdOfTest asp-route-number=@CsInHtml.Increment(Model.Task.Id)>Next</a>
-}
-else
-{
-    <a asp-controller="Tests" asp-action="Result">Result</a>
-}

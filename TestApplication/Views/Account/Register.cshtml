@@ -2,30 +2,30 @@
     ViewData["Title"] = "Register";
 }
 
-@model TestApplication.ViewModels.RegisterModel
+@model RegisterModel
 
 <h2>Registration</h2>
 
-<form asp-action="Tests" asp-controller="Tests" asp-anti-forgery="true">
-    <div class="validation" asp-validation-summary="ModelOnly"></div>
-    <div>
-        <div>
-            <label asp-for="Email">Write Email</label><br />
-            <input type="text" asp-for="Email" />
-            <span asp-validation-for="Email" />
-        </div>
-        <div>
-            <label asp-for="Password">Write password</label><br />
-            <input asp-for="Password" />
-            <span asp-validation-for="Password" />
-        </div>
-        <div>
-            <label asp-for="ConfirmPassword">Repeat password</label><br />
-            <input asp-for="ConfirmPassword" />
-            <span asp-validation-for="ConfirmPassword" />
-        </div>
-        <div>
-            <input type="submit" value="Registration" />
-        </div>
-    </div>
+<form method="post" class="form-group">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <p>
+        <label asp-for="Email"></label><br />
+        <input asp-for="Email" class="form-control"/>
+        <span asp-validation-for="Email" />
+    </p>
+    <p>
+        <label asp-for="Password"></label><br />
+        <input asp-for="Password" class="form-control"/>
+        <span asp-validation-for="Password" />
+    </p>
+    <p>
+        <label asp-for="ConfirmPassword"></label><br />
+        <input asp-for="ConfirmPassword" class="form-control"/>
+        <span asp-validation-for="ConfirmPassword" />
+    </p>
+    <p>
+        <br /><input type="submit" value="Registration" class="btn btn-outline-primary"/>
+    </p>
 </form>
+
+<a asp-action="Index" asp-controller="Home" class="btn btn-danger">Back</a>

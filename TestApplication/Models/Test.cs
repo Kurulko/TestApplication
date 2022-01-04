@@ -11,7 +11,8 @@ namespace TestApplication.Models
         public string Description { get; set; }
         public string Name { get; set; }
         public int Id { get; set; }
-        [NotMapped]
         public List<Task> Tasks { get; set; }
+        public int UserId { get; set; }
+        public User User { get; set; }
     }
 }

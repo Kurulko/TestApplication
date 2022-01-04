@@ -12,6 +12,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using TestApplication.Models.Database;
+using Microsoft.AspNetCore.Identity;
+using TestApplication.Models;
 
 namespace TestApplication
 {
@@ -32,8 +34,11 @@ namespace TestApplication
             services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
                 .AddCookie(options =>
                 {
-                    options.LoginPath = new PathString("/Account/Login");
+                    options.LoginPath = new PathString("/Home/Index");
                 });
+
+            services.AddIdentity<User, IdentityRole>()
+                .AddEntityFrameworkStores<ApplicationContext>();
 
             services.AddControllersWithViews();
         }
@@ -51,8 +56,6 @@ namespace TestApplication
             app.UseRouting();
 
             app.UseAuthentication(); 
-            app.UseAuthorization();
-
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>

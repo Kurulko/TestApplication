@@ -10,87 +10,73 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using System.Security.Claims;
+using Microsoft.AspNetCore.Identity;
 
 namespace TestApplication.Controllers
 {
     public class AccountController : Controller
     {
-        ApplicationContext db;
-        public AccountController(ApplicationContext context)
+        readonly UserManager<User> _userManager;
+        readonly SignInManager<User> _signInManager;
+        readonly ApplicationContext db;
+
+        public AccountController(UserManager<User> userManager, SignInManager<User> signInManager
+            , ApplicationContext context)
         {
+            _userManager = userManager;
+            _signInManager = signInManager;
             db = context;
         }
 
         [HttpGet]
-        public IActionResult Login()
-        {
-            return View();
-        }
-
+        public IActionResult Register() => View();
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Login(LoginModel model)
+        public async Task<IActionResult> Register(RegisterModel model)
         {
             if (ModelState.IsValid)
             {
-                User user = await db.Users.FirstOrDefaultAsync(u => u.Email == model.Email && u.Password == model.Password);
-                if (user != null)
-                {
-                    await Authenticate(model.Email);
+                User user = new User {
+                    Email = model.Email,
+                    UserName = model.Email,
+                    Tests = RandomTests.GetRandomTests(db.Tests.ToList())
+                };
 
+                IdentityResult result = await _userManager.CreateAsync(user, model.Password);
+                if (result.Succeeded)
+                {
+                    await _signInManager.SignInAsync(user, false);
                     return RedirectToAction("Index", "Home");
                 }
-                ModelState.AddModelError("", "Wrong email or password");
+                else
+                    foreach (var error in result.Errors)
+                        ModelState.AddModelError("", error.Description);
             }
             return View(model);
         }
 
         [HttpGet]
-        public IActionResult Register()
-        {
-            return View();
-        }
-
+        public IActionResult Login() => View();
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Register(RegisterModel model)
+        public async Task<IActionResult> Login(LoginModel model)
         {
             if (ModelState.IsValid)
             {
-                User user = await db.Users.FirstOrDefaultAsync(u => u.Email == model.Email);
-                if (user == null)
-                {
-
-                    db.Users.Add(new User { Email = model.Email, Password = model.Password });
-                    await db.SaveChangesAsync();
-
-                    await Authenticate(model.Email); 
-
+                var result =
+                    await _signInManager.PasswordSignInAsync(model.Email, model.Password, true, false);
+                
+                if (result.Succeeded)
                     return RedirectToAction("Index", "Home");
-                }
                 else
-                    ModelState.AddModelError("", "Wrong email or password");
+                    ModelState.AddModelError("", "Incorrect data");
             }
             return View(model);
         }
 
-        
-        async System.Threading.Tasks.Task Authenticate(string userName)
-        {
-            var claims = new List<Claim>
-            {
-                new Claim(ClaimsIdentity.DefaultNameClaimType, userName)
-            };
-
-            ClaimsIdentity id = new ClaimsIdentity(claims, "ApplicationCookie", ClaimsIdentity.DefaultNameClaimType, ClaimsIdentity.DefaultRoleClaimType);
-
-            await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(id));
-        }
-
         public async Task<IActionResult> Logout()
         {
-            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-            return RedirectToAction("Login", "Account");
+            await _signInManager.SignOutAsync();
+            return RedirectToAction("Index", "Home");
         }
     }
+
 }

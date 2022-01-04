@@ -9,10 +9,13 @@ namespace TestApplication.ViewModels
     public class LoginModel
     {
         [Required(ErrorMessage = "Enter your Email")]
+        [EmailAddress]
+        [Display(Name = "Write Email")]
         public string Email { get; set; }
 
         [DataType(DataType.Password)]
         [Required(ErrorMessage = "Enter your password")]
+        [Display(Name = "Write password")]
         public string Password { get; set; }
     }
 }

@@ -2,7 +2,7 @@
     ViewData["Title"] = "Result";
 }
 
-@model int
-The result of the test: @Model / @TestApplication.Controllers.TestsController.CountOfTask
+@model ResultAndCount
+The result of the test: @Model.Result / @Model.CountOfTest
 <br />
-<a asp-controller="Tests" asp-action="Tests">Back</a>
+<a asp-controller="Tests" asp-action="Tests" class="btn btn-outline-danger">Back</a>

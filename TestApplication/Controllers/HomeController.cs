@@ -12,10 +12,15 @@ namespace TestApplication.Controllers
 {
     public class HomeController : Controller
     {
-        [Authorize]
         public IActionResult Index()
         {
-            return Content(User.Identity.Name);
+            if (User.Identity.IsAuthenticated)
+                return RedirectToAction("Tests", "Tests");
+            return View();
+        }
+        public IActionResult Who()
+        {
+            return Content($"{User.Identity.Name} - {User.Identity.IsAuthenticated}");
         }
     }
 }

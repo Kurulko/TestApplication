@@ -2,12 +2,17 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using TestApplication.Models.Database;
 using TestApplication.Models;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authorization;
+using TestApplication.ViewModels;
+using Microsoft.AspNetCore.Identity;
+using System.Threading.Tasks;
 
 namespace TestApplication.Controllers
 {
+    [Authorize]
     public class TestsController : Controller
     {
         ApplicationContext db;
@@ -15,66 +20,72 @@ namespace TestApplication.Controllers
         {
             db = context;
         }
-        static List<Test> tests = new List<Test>();
-        public static int CountOfRightAsnwers { get; set; }
-        public static int CountOfTask { get;}
 
-        static TestsController()
-        {
-            //for (int i = 0; i < 50; ++i)
-            //{
-            //    db.Tests.Add(new Test() { Description = $"Краткое описание теста №{i}", Name = $"Test №{i}" });
-            //    db.SaveChanges();
-            //}
-            for (int i = 0; i < 50; ++i)
-                tests.Add(new Test()
-                {
-                    Description = $"Краткое описание теста №{i}",
-                    Name = $"Test №{i}",
-                    Id = i,
-                    Tasks = new List<Models.Task>() {
-                        new Models.Task()
-                        {
-                            Answer = 2 + i,
-                            Question = $"#1: 2+{i} = ?",
-                            Id = 0
-                        },
-                        new Models.Task()
-                        {
-                            Answer = 3 + i,
-                            Question = $"#2: 3+{i} = ?",
-                            Id = 1
-                        },
-                        new Models.Task()
-                        {
-                            Answer = 4 + i,
-                            Question = $"#3: 4+{i} = ?",
-                            Id = 2
-                        }
-                    }
-                });
-            CountOfTask = tests[0].Tasks.Count;
-        }
         public IActionResult Tests()
         {
-            return View(RandomTests.GetRandomTests(/*db.Tests.ToList()*/tests));
+            string name = User.Identity.Name;
+
+            List<Test> tests = db.Tests
+                .Include(t => t.Tasks)
+                .Where(t => t.User.UserName == name).ToList();
+
+            return View(tests);
         }
-        public IActionResult Test(int id)
+
+        [HttpGet]
+        public IActionResult Test(int? id)
         {
-            return View(tests[id]);
+            if (id != null)
+            {
+                Test test = db.Tests.Include(t => t.Tasks)
+                    .FirstOrDefault(t => t.Id == id);
+                if (test != null)
+                    return View(test);
+            }
+            return RedirectToAction("Tests");
         }
-        public IActionResult Task(int id,int number)
+        [HttpPost]
+        public IActionResult Test(bool can, int id)
         {
-            return View(new TaskAndIdOfTest() { Task = tests[id].Tasks[number], IdOfTest = id });
+            if (can)
+                return RedirectToAction("Task", new { idTest = id });
+            return RedirectToAction("Test", new { id = id });
         }
-        public IActionResult Result()
+
+        public IActionResult Task(int idTest, int idTask, int result)
         {
-            return View(CountOfRightAsnwers);
+            Test test = db.Tests
+            .Include(t => t.Tasks)
+            .FirstOrDefault(t => t.Id == idTest);
+
+            if (test == null)
+                return RedirectToAction("Tests");
+
+            int countOfTest = test.Tasks.Count;
+
+            if (idTask < countOfTest)
+            {
+                Models.Task task = test.Tasks[idTask];
+                TaskAndResult taskAndResult = new TaskAndResult
+                {
+                    Result = result,
+                    Task = task,
+                    IdTask = idTask
+                };
+                return View(taskAndResult);
+            }
+            return RedirectToAction("Result", new { result = result, countOfTest = countOfTest });
+        }
+        public IActionResult Result(int? result, int? countOfTest)
+        {
+            if (result != null && countOfTest != null)
+                return View(new ResultAndCount
+                {
+                    Result = (int)result,
+                    CountOfTest = (int)countOfTest
+                });
+            return RedirectToAction("Tests");
         }
     }
-    public class TaskAndIdOfTest
-    {
-        public Models.Task Task { get; set; }
-        public int IdOfTest { get; set; }
-    }
+
 }
